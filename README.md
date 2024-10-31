@@ -17,7 +17,8 @@ from math import sin, cos, acos, radians
 file_path = "/FP_KKA/District_Data.csv"  
 df = pd.read_csv(file_path)
 
-df["Average House Price (IDR)"] = df["Average House Price (IDR)"].replace(',', '', regex=True).astype(float)`
+df["Average House Price (IDR)"] = df["Average House Price (IDR)"].replace(',', '', regex=True).astype(float)
+`
 
 `target_lat = float(input("Enter target latitude: "))
 target_lon = float(input("Enter target longitude: "))
@@ -27,13 +28,15 @@ w_distance = float(input("Enter weight for Distance: "))
 w_price = float(input("Enter weight for House Price: "))
 max_crime_rate = float(input("Enter maximum allowed Crime Rate (percentage): "))
 max_distance = float(input("Enter maximum allowed Distance (km): "))
-max_price = float(input("Enter maximum allowed House Price (IDR): "))`
+max_price = float(input("Enter maximum allowed House Price (IDR): "))
+`
 
 `# Calculate distance between two points
 def distance(lat1, lon1, lat2, lon2):
     R = 6371.0 
     lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])  
-    return acos(sin(lat1) * sin(lat2) + cos(lat1) * cos(lat2) * cos(lon2 - lon1)) * R`
+    return acos(sin(lat1) * sin(lat2) + cos(lat1) * cos(lat2) * cos(lon2 - lon1)) * R
+`
 
 `# Calculate distance and cumulative cost for each district
 priority_queue = []
@@ -53,7 +56,8 @@ if priority_queue:
     print(f"District: {lowest_cost_district[1]}, Cost: {lowest_cost_district[0]:,.0f}")
     print(f"Distance: {lowest_cost_district[2]:.2f} km, Avg House Price: {lowest_cost_district[3]:,.0f} IDR, Crime Rate: {lowest_cost_district[4]}%")
 else:
-    print("No suitable districts found that meet all criteria.")`
+    print("No suitable districts found that meet all criteria.")
+`
 
 ### 2. Uninformed Search (A* Algorithm)
 
