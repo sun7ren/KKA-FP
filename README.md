@@ -7,7 +7,7 @@ Group 4 - Search for Suitable Houses
 ### Data Collected
 
 
-### 1. Informed Search
+### 1. Informed Search (Uniform Cost Search)
 
 ### 2. Uninformed Search (A* Algorithm)
 
