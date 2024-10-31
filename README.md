@@ -9,6 +9,6 @@ Group 4 - Search for Suitable Houses
 
 ### 1. Informed Search
 
-### 2. Uninformed Search (A/*/ Algorithm)
+### 2. Uninformed Search (A* Algorithm)
 
 ### 3. Local Search
