@@ -10,7 +10,8 @@ Group 4 - Search for Suitable Houses
 ### 1. Informed Search (Uniform Cost Search)
 
  **Initialization**
-```import pandas as pd
+```py
+import pandas as pd
 import heapq
 import numpy as np
 from math import sin, cos, acos, radians
@@ -25,7 +26,8 @@ df["Average House Price (IDR)"] = df["Average House Price (IDR)"].replace(',', '
   Reads data from a CSV file (District_Data.csv), imports the required libraries, then converts the Average House Price column to a numeric (float) format after removing commas. In later stages of the software, this gets the data ready for additional computations like cost and distance analysis.
 
  **User Inputs**
-```target_lat = float(input("Enter target latitude: "))
+```py
+target_lat = float(input("Enter target latitude: "))
 target_lon = float(input("Enter target longitude: "))
 
 w_crime = float(input("Enter weight for Crime Rate: "))
@@ -40,7 +42,8 @@ max_price = float(input("Enter maximum allowed House Price (IDR): "))
   Gathers user input regarding the latitude and longitude of the target place, gives weights to the criteria of house price, distance, and crime rate, and establishes upper limits for each: the maximum permitted house price (in IDR), distance (in kilometers), and crime rate (in percentage). By weighing the relative relevance of each criterion and eliminating inappropriate possibilities, these inputs will direct the search process.
 
  **Distance Calculation between the Target Location and currently assessed district**
-```# Calculate distance between two points
+```py
+# Calculate distance between two points
 def distance(lat1, lon1, lat2, lon2):
     R = 6371.0 
     lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])  
@@ -50,7 +53,8 @@ def distance(lat1, lon1, lat2, lon2):
   
   This function, distance, determines the great-circle distance between two geographic locations on the Earth's surface (identified by lat1, lon1, and lat2, {lon2}). Using the Spherical Law of Cosines, it first converts latitude and longitude information from degrees to radians. The shortest route between the locations is then determined using the formula, where R = 6371.0 is the Earth's radius in kilometers. The final result is the distance in kilometers between the two places. Implementation for determining the ideal neighborhood based on average home price, distance to a target place, and crime rate.
  
-```# Calculate distance and cumulative cost for each district
+```py
+# Calculate distance and cumulative cost for each district
 priority_queue = []
 for index, row in df.iterrows():
     distance = distance(target_lat, target_lon, row["Latitude"], row["Longitude"])
@@ -65,7 +69,8 @@ for index, row in df.iterrows():
   Using user-defined weights, it iterates through each district in the dataset, computing a cumulative "cost" that includes the house price, distance, and crime rate. Each district is added to a priority queue, where entries are arranged by cumulative cost, provided that it satisfies the designated maximum thresholds for price, distance, and crime rate. From this priority queue, the district that best fits the requirements and has the lowest cost is then selected as the best option.
 
  **Prints out the results**
-```# Retrieve the district with the lowest cost
+```py
+# Retrieve the district with the lowest cost
 if priority_queue:
     lowest_cost_district = heapq.heappop(priority_queue)
     print("Best district based on Uniform-Cost Search:")
@@ -79,5 +84,22 @@ else:
   Obtains and shows the district from the priority_queue—which was constructed using Uniform-Cost Search—with the lowest cumulative cost. The district with the lowest cost is returned using heapq.heappop, which prints information such as the district name, cumulative cost, distance, average house price, and crime rate, if the priority_queue has any entries. It prints a message saying that no acceptable districts were discovered if the queue is empty, which indicates that no districts fit the requirements.
 
 ### 2. Uninformed Search (A* Algorithm)
+```py
+# Calculate distance and cumulative heuristic cost for each district
+priority_queue = []
+for index, row in df.iterrows():
+    distance = distance(target_lat, target_lon, row["Latitude"], row["Longitude"])
+    g_cost = w_crime * row["Crime Rate (Percent)"] + w_distance * distance + w_price * row["Average House Price (IDR)"]
+    h_cost = distance
+    f_cost = g_cost + h_cost #heuristic function
+
+    # Only consider districts meeting the threshold criteria
+    if row["Crime Rate (Percent)"] <= max_crime_rate and distance <= max_distance and row["Average House Price (IDR)"] <= max_price:
+        heapq.heappush(priority_queue, (f_cost, row["District"], distance, row["Average House Price (IDR)"], row["Crime Rate (Percent)"]))
+```
+The algorithm for A* Search is virtually the same as Uniform-Cost Search, with the addition of `f(n)` being our argument instead of cost, where `f(n) = cost + distance`.
+
+Above is the modification done to Uniform-Cost Search to make it into an A* Search. Previously defined `cost` in UCS is redefined as `g_cost`, while two new variables `h_cost` representing distance and `f_cost` representing the whole heuristic function is added.
+Now we push the heap using `f_cost` instead of `cost`
 
 ### 3. Local Search
