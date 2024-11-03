@@ -20,6 +20,9 @@ max_crime_rate = float(input("Enter maximum allowed Crime Rate (percentage): "))
 max_distance = float(input("Enter maximum allowed Distance (km): "))
 max_price = float(input("Enter maximum allowed House Price (IDR): "))
 
+start_time = time.time()
+tracemalloc.start()
+
 # Calculate distance between two points
 def distance(lat1, lon1, lat2, lon2):
     R = 6371.0 
@@ -46,3 +49,10 @@ if priority_queue:
     print(f"Distance: {lowest_heurCost_district[2]:.2f} km, Avg House Price: {lowest_heurCost_district[3]:,.0f} IDR, Crime Rate: {lowest_heurCost_district[4]}%")
 else:
     print("No suitable districts found that meet all criteria.")
+
+execution_time = time.time() - start_time
+current_memory, peak_memory = tracemalloc.get_traced_memory()
+tracemalloc.stop()
+memory_usage_mb = peak_memory / (1024 * 1024)
+
+print(f"Execution Time: {execution_time:.4f} seconds, Memory Usage: {memory_usage_mb:.2f} MB")
