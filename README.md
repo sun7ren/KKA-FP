@@ -102,4 +102,37 @@ The algorithm for A* Search is virtually the same as Uniform-Cost Search, with t
 Above is the modification done to Uniform-Cost Search to make it into an A* Search. Previously defined `cost` in UCS is redefined as `g_cost`, while two new variables `h_cost` representing distance and `f_cost` representing the whole heuristic function is added.
 Now we push the heap using `f_cost` instead of `cost`
 
-### 3. Local Search
+### 3. Local Search (Simulated Annealing)
+
+```py
+initial_temp = 1000
+cooling_rate = 0.01
+
+while temperature > 1e-3:
+
+    neighbor_index = random.choice(df.index)
+    neighbor_row = df.loc[neighbor_index]
+    neighbor_distance = distance(target_lat, target_lon, neighbor_row["Latitude"], neighbor_row["Longitude"])
+
+    
+    if (neighbor_row["Crime Rate (Percent)"] <= max_crime_rate and
+        neighbor_distance <= max_distance and
+        neighbor_row["Average House Price (IDR)"] <= max_price):
+        
+        neighbor_cost = calculate_cost(neighbor_row, neighbor_distance)
+        delta_cost = neighbor_cost - current_cost
+        
+        
+        if delta_cost < 0 or np.random.rand() < exp(-delta_cost / temperature):
+            current_index, current_row, current_cost, current_distance = neighbor_index, neighbor_row, neighbor_cost, neighbor_distance
+            
+        
+            if current_cost < best_cost:
+                best_row, best_cost = current_row, current_cost
+
+
+    temperature *= (1 - cooling_rate)
+```
+For Simulated Annealing, it is the same as Uniform-Cost Search. The difference is only in how the search is conducted. It starts using a while loop until the temperature is smaller than 0.001.
+
+`if delta_cost < 0 or np.random.rand() < exp(-delta_cost / temperature)` is a condition to check whether the neighbor cost is lower than the current cost. Additionally, if the delta cost is greater than 0, it also has an acceptance probability for a worse solution by comparing it with a randomly generated number. This allows the algorithm to explore other solutions and escape from local minima.
