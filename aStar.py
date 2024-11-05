@@ -10,7 +10,6 @@ def calculate_distance(lat1, lon1, lat2, lon2):
     lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])  
     return acos(sin(lat1) * sin(lat2) + cos(lat1) * cos(lat2) * cos(lon2 - lon1)) * R
 
-
 file_path = "District_Data.csv"  
 df = pd.read_csv(file_path)
 
@@ -31,7 +30,7 @@ tracemalloc.start()
 priority_queue = []
 for index, row in df.iterrows():
     dist = calculate_distance(target_lat, target_lon, row["Latitude"], row["Longitude"])
-    g_cost = w_crime * row["Crime Rate (Percent)"] + w_distance * dist + w_price * row["Average House Price (IDR)"]
+    g_cost = (w_crime/100) * row["Crime Rate (Percent)"] + (w_distance/100) * distance + (w_price/100) * (row["Average House Price (IDR)"]/1000000000)
     h_cost = dist
     f_cost = g_cost + h_cost  # Heuristic function
 
