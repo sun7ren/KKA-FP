@@ -83,12 +83,12 @@ else:
 
   Obtains and shows the district from the priority_queue—which was constructed using Uniform-Cost Search—with the lowest cumulative cost. The district with the lowest cost is returned using heapq.heappop, which prints information such as the district name, cumulative cost, distance, average house price, and crime rate, if the priority_queue has any entries. It prints a message saying that no acceptable districts were discovered if the queue is empty, which indicates that no districts fit the requirements.
 
-### 2. Uninformed Search (A* Algorithm)
+### 2. Informed Search (A* Algorithm)
 ```py
 # Calculate distance and cumulative heuristic cost for each district
 priority_queue = []
 for index, row in df.iterrows():
-    distance = distance(target_lat, target_lon, row["Latitude"], row["Longitude"])
+    distance = calculate_distance(target_lat, target_lon, row["Latitude"], row["Longitude"])
     g_cost = w_crime * row["Crime Rate (Percent)"] + w_distance * distance + w_price * row["Average House Price (IDR)"]
     h_cost = distance
     f_cost = g_cost + h_cost #heuristic function
