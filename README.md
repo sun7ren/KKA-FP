@@ -5,7 +5,13 @@ Group 4 - Search for Suitable Houses
 - Finding the right house location is increasingly difficult due to the need to balance three factors: distance to essential places, housing costs, and neighbourhood safety (crime rates). Affordable housing is usually located far from workplaces, while safer neighbourhoods and more convincing areas are typically more expensive. This creates a complex decision-making process for individuals and families. We chose this problem to provide a solution to help simplify the search by considering these factors together.
 
 ## Data Collected
+We have attained 196 rows of data which entails on Districts/Quarters, its respective latitude and longitude coordinates, average house prices, and average crime rate percentages.
 
+References are as follows: 
+1. Districts/Quarters data: https://www.citypopulation.de/en/indonesia/kotasurabaya/admin/
+2. Latitude and Longitude: Right clicking the middle of the area in Google Maps
+3. Average House Prices: https://www.dotproperty.id/
+4. Average Crime Rate Percentages: https://www.researchgate.net/publication/371511639_The_Utilization_of_Information_System_for_Crime_Rate_Modelling_in_Surabaya_Using_K-means
 
 ### 1. Informed Search (Uniform Cost Search)
 
