@@ -45,9 +45,7 @@ def distance(lat1, lon1, lat2, lon2):
 
 
 def calculate_cost(row, dist):
-    return (w_crime * row["Crime Rate (Percent)"] +
-            w_distance * dist +
-            w_price * row["Average House Price (IDR)"])
+    return ((w_crime/100) * row["Crime Rate (Percent)"] + (w_distance/100) * distance + (w_price/100) * (row["Average House Price (IDR)"]/1000000000))
 
 
 start_time = time.time()
