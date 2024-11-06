@@ -46,8 +46,9 @@ if priority_queue:
 else:
     print("No suitable districts found that meet all criteria.")
 
-end_time = time.time()
+execution_time = time.time() - start_time
 current, peak = tracemalloc.get_traced_memory()
+memory_usage_mb = peak / 10**6
 tracemalloc.stop()
 
-print(f"Execution Time: {end_time:.4f} seconds, Memory Usage: {memory_usage_mb:.2f} MB")
+print(f"Execution Time: {execution_time:.4f} seconds, Memory Usage: {memory_usage_mb:.2f} MB")
