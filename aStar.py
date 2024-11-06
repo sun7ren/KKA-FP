@@ -42,7 +42,7 @@ for index, row in df.iterrows():
 if priority_queue:
     lowest_heurCost_district = heapq.heappop(priority_queue)
     print("Best district based on A* Search:")
-    print(f"District: {lowest_heurCost_district[1]}, Cost: {lowest_heurCost_district[0]:,.0f}")
+    print(f"District: {lowest_heurCost_district[1]}, Cost: {lowest_heurCost_district[0]:,.2f}")
     print(f"Distance: {lowest_heurCost_district[2]:.2f} km, Avg House Price: {lowest_heurCost_district[3]:,.0f} IDR, Crime Rate: {lowest_heurCost_district[4]}%")
 else:
     print("No suitable districts found that meet all criteria.")
