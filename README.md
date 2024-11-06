@@ -22,6 +22,9 @@ import pandas as pd
 import heapq
 import numpy as np
 from math import sin, cos, acos, radians
+import time
+import tracemalloc
+
 
 file_path = "/FP_KKA/District_Data.csv"  
 df = pd.read_csv(file_path)
@@ -30,7 +33,7 @@ df["Average House Price (IDR)"] = df["Average House Price (IDR)"].replace(',', '
 ```
 - Explanation
   
-  Reads data from a CSV file (District_Data.csv), imports the required libraries, then converts the Average House Price column to a numeric (float) format after removing commas. In later stages of the software, this gets the data ready for additional computations like cost and distance analysis.
+  The code imports the required libraries for data handling, calculations, and performance tracking. It reads the district data from a CSV file into a DataFrame and prepares the "Average House Price (IDR)" column for numerical operations by removing commas.
 
  **User Inputs**
 ```py
@@ -58,26 +61,34 @@ def distance(lat1, lon1, lat2, lon2):
 ```
 - Explanation
   
-  This function, distance, determines the great-circle distance between two geographic locations on the Earth's surface (identified by lat1, lon1, and lat2, {lon2}). Using the Spherical Law of Cosines, it first converts latitude and longitude information from degrees to radians. The shortest route between the locations is then determined using the formula, where R = 6371.0 is the Earth's radius in kilometers. The final result is the distance in kilometers between the two places. Implementation for determining the ideal neighborhood based on average home price, distance to a target place, and crime rate.
- 
+  This function calculates the distance between the target location and each district using the spherical law of cosines. It converts latitude and longitude from degrees to radians for accurate distance calculation in kilometers, considering the Earth’s curvature.
+
+   **Start Time and Memory Allocating**
 ```py
-# Calculate distance and cumulative cost for each district
+start_time = time.time()
+tracemalloc.start()
+```
+ - Explanation
+  
+  The program begins tracking execution time and memory usage. time.time() records the start time, and tracemalloc.start() enables memory monitoring. These measurements provide insights into the program’s efficiency.
+
+    **Search Loop with Cost Allocation**
+```py
 priority_queue = []
 for index, row in df.iterrows():
     distance = distance(target_lat, target_lon, row["Latitude"], row["Longitude"])
-    cost = w_crime * row["Crime Rate (Percent)"] + w_distance * distance + w_price * row["Average House Price (IDR)"]
+    cost = (w_crime/100) * row["Crime Rate (Percent)"] + (w_distance/100) * distance + 
+    (w_price/100) * (row["Average House Price (IDR)"]/1000000000)
 
-    # Only consider districts meeting the threshold criteria
     if row["Crime Rate (Percent)"] <= max_crime_rate and distance <= max_distance and row["Average House Price (IDR)"] <= max_price:
         heapq.heappush(priority_queue, (cost, row["District"], distance, row["Average House Price (IDR)"], row["Crime Rate (Percent)"]))
 ```
 - Explanation
   
-  Using user-defined weights, it iterates through each district in the dataset, computing a cumulative "cost" that includes the house price, distance, and crime rate. Each district is added to a priority queue, where entries are arranged by cumulative cost, provided that it satisfies the designated maximum thresholds for price, distance, and crime rate. From this priority queue, the district that best fits the requirements and has the lowest cost is then selected as the best option.
+  This loop iterates over each district, calculating the distance to the target location and a weighted "cost" based on the user’s criteria. Only districts meeting the maximum thresholds for crime rate, distance, and house price are considered. The calculated cost is a combination of crime rate, distance, and price, adjusted by their respective weights, and eligible districts are added to the priority queue.
 
  **Prints out the results**
 ```py
-# Retrieve the district with the lowest cost
 if priority_queue:
     lowest_cost_district = heapq.heappop(priority_queue)
     print("Best district based on Uniform-Cost Search:")
@@ -88,33 +99,57 @@ else:
 ```
 - Explanation
 
-  Obtains and shows the district from the priority_queue—which was constructed using Uniform-Cost Search—with the lowest cumulative cost. The district with the lowest cost is returned using heapq.heappop, which prints information such as the district name, cumulative cost, distance, average house price, and crime rate, if the priority_queue has any entries. It prints a message saying that no acceptable districts were discovered if the queue is empty, which indicates that no districts fit the requirements.
+  The program retrieves the district with the lowest cost from the priority queue. It displays the selected district’s name, cost, distance, average house price, and crime rate. If no district meets the criteria, it notifies the user.
+
+ **Performance Metrics**
+```py
+execution_time = time.time() - start_time
+current, peak = tracemalloc.get_traced_memory()
+memory_usage_mb = peak / 10**6
+tracemalloc.stop()
+
+print(f"Execution Time: {execution_time:.4f} seconds, Memory Usage: {memory_usage_mb:.2f} MB")
+```
+- Explanation
+
+  The program calculates and displays the execution time and peak memory usage. Execution time is the difference between the start time and the current time, while memory usage is recorded using tracemalloc. These metrics help assess the program’s resource consumption.
 
 ### 2. Informed Search (A* Algorithm)
 ```py
-# Calculate distance and cumulative heuristic cost for each district
 priority_queue = []
 for index, row in df.iterrows():
-    distance = calculate_distance(target_lat, target_lon, row["Latitude"], row["Longitude"])
-    g_cost = w_crime * row["Crime Rate (Percent)"] + w_distance * distance + w_price * row["Average House Price (IDR)"]
-    h_cost = distance
-    f_cost = g_cost + h_cost #heuristic function
+    dist = calculate_distance(target_lat, target_lon, row["Latitude"], row["Longitude"])
+    g_cost = (w_crime/100) * row["Crime Rate (Percent)"] + (w_distance/100) * distance + (w_price/100) * (row["Average House Price (IDR)"]/1000000000)
+    h_cost = dist
+    f_cost = g_cost + h_cost  # Heuristic function
 
     # Only consider districts meeting the threshold criteria
-    if row["Crime Rate (Percent)"] <= max_crime_rate and distance <= max_distance and row["Average House Price (IDR)"] <= max_price:
-        heapq.heappush(priority_queue, (f_cost, row["District"], distance, row["Average House Price (IDR)"], row["Crime Rate (Percent)"]))
+    if row["Crime Rate (Percent)"] <= max_crime_rate and dist <= max_distance and row["Average House Price (IDR)"] <= max_price:
+        heapq.heappush(priority_queue, (f_cost, row["District"], dist, row["Average House Price (IDR)"], row["Crime Rate (Percent)"]))
 ```
-The algorithm for A* Search is virtually the same as Uniform-Cost Search, with the addition of `f(n)` being our argument instead of cost, where `f(n) = cost + distance`.
+This loop iterates over each district in the DataFrame, calculates the weighted cost and heuristic distance, and adds eligible districts to the priority queue.
 
-Above is the modification done to Uniform-Cost Search to make it into an A* Search. Previously defined `cost` in UCS is redefined as `g_cost`, while two new variables `h_cost` representing distance and `f_cost` representing the whole heuristic function is added.
-Now we push the heap using `f_cost` instead of `cost`
+- g_cost represents the weighted cost based on crime rate, distance, and price.
+- h_cost is the heuristic value, representing the actual distance to the target location.
+- f_cost combines `g_cost` and `h_cost`, aligning with A*’s approach of balancing known costs with heuristic estimates.
+Only districts that meet the maximum allowed thresholds for crime rate, distance, and price are considered and added to the priority queue, with the lowest `f_cost` prioritized.
 
 ### 3. Local Search (Simulated Annealing)
 
+**Simulated Annealing Setup**
 ```py
-initial_temp = 1000
-cooling_rate = 0.01
+current_index = random.choice(df.index)
+current_row = df.loc[current_index]
+current_distance = distance(target_lat, target_lon, current_row["Latitude"], current_row["Longitude"])
+current_cost = calculate_cost(current_row, current_distance)
+best_row, best_cost = current_row, current_cost
 
+temperature = initial_temp
+```
+The program randomly selects an initial district to begin the Simulated Annealing process. It calculates the initial distance and cost for this district, then sets the initial district as the "current" and "best" solution. The temperature is initialized with the user-defined initial temperature.
+
+**Simulated Annealing Loop**
+```py
 while temperature > 1e-3:
 
     neighbor_index = random.choice(df.index)
@@ -140,6 +175,22 @@ while temperature > 1e-3:
 
     temperature *= (1 - cooling_rate)
 ```
-For Simulated Annealing, it is the same as Uniform-Cost Search. The difference is only in how the search is conducted. It starts using a while loop until the temperature is smaller than 0.001.
+The loop iterates as long as the temperature remains above a small threshold. In each iteration:
 
-`if delta_cost < 0 or np.random.rand() < exp(-delta_cost / temperature)` is a condition to check whether the neighbor cost is lower than the current cost. Additionally, if the delta cost is greater than 0, it also has an acceptance probability for a worse solution by comparing it with a randomly generated number. This allows the algorithm to explore other solutions and escape from local minima.
+- A neighboring district is randomly selected.
+- The program checks if this neighboring district meets the maximum thresholds for crime rate, distance, and price.
+- If it meets the criteria, the program calculates the neighbor's cost and compares it to the current cost.
+    - If the new cost is lower, the neighbor becomes the current district.
+    - If the new cost is higher, the program may still accept the neighbor with a probability that decreases as the temperature lowers, allowing exploration of potentially better solutions.
+- If the neighbor’s cost is lower than the best cost, the neighbor becomes the best solution.
+- The temperature decreases gradually, simulating the cooling process.
+
+**Logging Results to CSV**
+```py
+with open(output_file, 'a', newline='') as file:
+    writer = csv.writer(file)
+    writer.writerow([best_row['District'], f"{best_cost:,.0f}", f"{current_distance:.2f}", 
+                     f"{best_row['Average House Price (IDR)']:,.0f}", f"{best_row['Crime Rate (Percent)']}", 
+                     f"{execution_time:.4f}", f"{memory_usage_mb:.2f}"])
+```
+The final results are appended to the CSV log file. This includes the best district found, along with its cost, distance, average house price, crime rate, execution time, and memory usage, allowing a record of each run.
