@@ -13,6 +13,7 @@ References are as follows:
 3. Average House Prices: https://www.dotproperty.id/
 4. Average Crime Rate Percentages: https://www.researchgate.net/publication/371511639_The_Utilization_of_Information_System_for_Crime_Rate_Modelling_in_Surabaya_Using_K-means
 
+## Code Implementations
 ### 1. Informed Search (Uniform Cost Search)
 
  **Initialization**
