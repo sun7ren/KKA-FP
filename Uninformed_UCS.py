@@ -33,7 +33,8 @@ tracemalloc.start()
 priority_queue = []
 for index, row in df.iterrows():
     distance = distance(target_lat, target_lon, row["Latitude"], row["Longitude"])
-    cost = (w_crime/100) * row["Crime Rate (Percent)"] + (w_distance/100) * distance + (w_price/100) * (row["Average House Price (IDR)"]/1000000000)
+    cost = (w_crime/100) * row["Crime Rate (Percent)"] + (w_distance/100) * distance + 
+    (w_price/100) * (row["Average House Price (IDR)"]/1000000000)
 
     if row["Crime Rate (Percent)"] <= max_crime_rate and distance <= max_distance and row["Average House Price (IDR)"] <= max_price:
         heapq.heappush(priority_queue, (cost, row["District"], distance, row["Average House Price (IDR)"], row["Crime Rate (Percent)"]))
